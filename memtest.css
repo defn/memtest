@@ -1,0 +1,15 @@
+html { background-color: #FCFFF5 }
+a, h1, h2, p { color: #3F403D; }
+
+td.game-piece {
+  width: 100px;
+  height: 100px;
+  padding: 3px;
+  background-color: #F5FFE0;
+  border: 1px solid #262626;
+}
+
+td.game-piece:hover {
+  background-color: #DDE5C9;
+  cursor: pointer;
+}
