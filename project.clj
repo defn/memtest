@@ -1,10 +1,10 @@
 (defproject memtest "0.1.0-SNAPSHOT"
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2173"]
-                 [reagent "0.4.2"]]
-  :plugins [[lein-cljsbuild "1.0.2"]]
+  :dependencies [[org.clojure/clojure "1.7.0"]
+                 [org.clojure/clojurescript "1.7.145"]
+                 [reagent "0.5.1"]]
+  :plugins [[lein-cljsbuild "1.1.0"]]
   :hooks [leiningen.cljsbuild]
   :profiles {:prod {:cljsbuild
                     {:builds
