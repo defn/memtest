@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+function main {
+  local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
+  PATH="$shome/bin:$shome/exec:$PATH"
+
+  lein compile
+}
+
+source sub "$BASH_SOURCE" "$@"
