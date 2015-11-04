@@ -1,96 +1,121 @@
+; defines a memtest.core object
 (ns memtest.core
   (:require [reagent.core :as reagent :refer [atom]]))
 
 (enable-console-print!)
 
-(def gameboard (atom (sorted-map)))
-(def counter (atom 0))
-(def found (atom #{}))
-(def selected (atom nil))
-(def highlighted (atom #{}))
-(def colors
+(def colors ; colors match the cell number
   {1 "#677685", 2 "#FFB492", 3 "#8EE6CA", 4 "#92387E",
    5 "#FFF6C9", 6 "#5C58EB", 7 "#D1052D", 8 "#857A67"})
 
+; A gameboard is a grid of cells, each uniquely identified, but two cells will
+; have the same number and colors.  The game is won when all cells have been
+; matched
+
+(def counter (atom 0))              ; generates unique ids for each cell
+(def gameboard (atom (sorted-map))) ; gameboard is sorted to preserve cell order
+(def matched (atom #{}))            ; numbers that have been matched
+(def selected (atom nil))           ; cell that was last selected
+(def highlighted (atom #{}))        ; cells that are highlighted
+
 (defn won-game?
   []
-  (= (/ (count @gameboard) 2) (count @found)))
+  ; game is won when count of matches is equal to half of gameboard, because
+  ; cells contain duplicate numbers
+  (= (/ (count @gameboard) 2) (count @matched)))
 
-(defn add-piece [n]
+(defn add-cell [n]
+  ; add a numbered cell with a unique id
   (let [id (swap! counter inc)]
     (swap! gameboard assoc id {:id id :number n :color (colors n)})))
 
 (defn new-game
   []
+  ; game starts out with an empty board, no cell selected, nothing hilighted,
+  ; and no matches
   (reset! gameboard (sorted-map))
   (reset! selected nil)
-  (reset! found #{})
+  (reset! matched #{})
   (reset! highlighted #{})
+  ; take two sets of numbers (1..8) and randomize their order, then add them as
+  ; cells
   (doseq [x (shuffle (into (range 1 9) (range 1 9)))]
-    (add-piece x)))
+    (add-cell x)))
 
+; initialize the board
 (new-game)
 
-(defn select-piece
-  [piece]
-  (reset! highlighted #{})
-  (reset! selected piece))
+(defn select-cell
+  [cell]                   ; ensures one cell is colored via selection
+  (reset! highlighted #{}) ; dont highlight anything
+  (reset! selected cell))  ; mark cell as selected
 
-(defn lose-piece
-  [piece]
-  (reset! highlighted #{piece @selected})
-  (reset! selected nil))
+(defn lose-cell
+  [cell]                                 ; ensures two cells are colored via highlighting
+  (reset! highlighted #{cell @selected}) ; highlight selected and current cell
+  (reset! selected nil))                 ; dont select anything
 
-(defn win-piece
-  [{:keys [number]}]
-  (reset! selected nil)
-  (reset! highlighted #{})
-  (swap! found conj number))
+(defn win-cell
+  [{:keys [number]}]                     ; ensures two more cells are colored via match
+  (reset! selected nil)                  ; dont select anything
+  (reset! highlighted #{})               ; dont highlight anything
+  (swap! matched conj number))           ; mark number as matched
 
 (defn winning-click?
   [{:keys [number id]}]
-  (and (= (:number @selected) number)
-       (not= (:id @selected) id)))
+  (and (= (:number @selected) number) ; win if the number matched the selected cell
+       (not= (:id @selected) id)))    ; and if it's not the same selected cell
 
 (defn handle-click
-  [{:keys [number id] :as piece}]
+  [{:keys [number id] :as cell}]
   (cond
-   (= @selected piece) (reset! selected nil)
-   (nil? @selected) (select-piece piece)
-   (winning-click? piece) (win-piece piece)
-   :else (lose-piece piece)))
+   (= @selected cell) (reset! selected nil) ; reset if selected cell is selected again
+   (nil? @selected) (select-cell cell)      ; set as selected if nothing was selected
+   (winning-click? cell) (win-cell cell)    ; mark as won if click is a dinner
+   :else (lose-cell cell)))                 ; else mark as lost
 
 (defn highlighted?
-  [piece]
-  (or (get @found (:number piece))
-      (= @selected piece)
-      (get @highlighted piece)))
+  [cell]
+  (or (get @matched (:number cell)) ; color if number matched
+      (= @selected cell)            ;       if selected
+      (get @highlighted cell)))     ;       if highlighted
 
 (defn board-cell []
-  (fn [{:keys [number color id] :as piece}]
-    [:td {:class "game-piece"
-          :style (if (highlighted? piece) {:background-color color} {})
-          :on-click #(handle-click piece)}]))
+  (fn [{:keys [number color id] :as cell}]
+    ; display cell with background color
+    [:td {:class "game-cell"
+          :style (if (highlighted? cell) {:background-color color} {})
+          :on-click #(handle-click cell)}]))
 
 (defn board-row []
   (fn [x]
     [:tr
-     (for [{:keys [id] :as piece} x]
-       ^{:key id} [board-cell piece])]))
+     ; loop through each cell in a row
+     (for [{:keys [id] :as cell} x]
+       ^{:key id} [board-cell cell])]))
 
+; the top level component
 (defn board [props]
   (fn []
-    (let [items (vals @gameboard)]
+    (let [cells (vals @gameboard)]
       [:div#container
+       ; game title
        [:h1 "The memory game"]
+       ; win status
        [:h2 (if (won-game?) "You won!")]
+       ; the gameboard
        [:table#gameboard
+        ; taking 4 cells at a time for each row
         (map-indexed
          (fn [idx x] ^{:key idx} [board-row x])
-         (partition 4 items))]
+         (partition 4 cells))]
+       ; text link to reset the game
        [:p [:a {:class "new-game" :on-click #(new-game)
                 :href "#"} "New game"]]])))
 
+; this is how the game is started
+; exports a run function in the memtest.core object
 (defn ^:export run []
   (reagent/render-component [board]
                             (.-body js/document)))
+
