@@ -5,7 +5,7 @@ function main {
   PATH="$shome/bin:$shome/exec:$PATH"
 
   cd "$shome"
-  exec http-server
+  lein figwheel
 }
 
 source sub "$BASH_SOURCE" "$@"
