@@ -100,9 +100,6 @@
        [:h1 "The Memory Game"]
        ; win status
        [:h2 (if (won-game?) "You won!!!")]
-       [:h2 (count @gameboard)]
-       [:h2 (count @matched)]
-       [:h2 @counter]
        ; the gameboard 
        [:table#gameboard
         ; taking 4 cells at a time for each row
