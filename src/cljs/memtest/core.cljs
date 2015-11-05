@@ -2,7 +2,9 @@
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
-              [accountant.core :as accountant]))
+              [accountant.core :as accountant]
+              [memtest.data :as mdata :refer [counter gameboard matched selected highlighted]]))
+
 
 (def colors ; colors match the cell number
   {1 "#677685", 2 "#FFB492", 3 "#8EE6CA", 4 "#92387E",
@@ -11,12 +13,6 @@
 ; A gameboard is a grid of cells, each uniquely identified, but two cells will
 ; have the same number and colors.  The game is won when all cells have been
 ; matched
-
-(def counter (atom 0))              ; generates unique ids for each cell
-(def gameboard (atom (sorted-map))) ; gameboard is sorted to preserve cell order
-(def matched (atom #{}))            ; numbers that have been matched
-(def selected (atom nil))           ; cell that was last selected
-(def highlighted (atom #{}))        ; cells that are highlighted
 
 (defn won-game?
   []
@@ -29,10 +25,6 @@
   ; add a numbered cell with a unique id
   (let [id (swap! counter inc)]
     (swap! gameboard assoc id {:id id :number n :color (colors n)})))
-
-(defn clicked 
-  []
-  (swap! counter inc))
 
 (defn new-game 
   []
@@ -119,9 +111,7 @@
          (partition 4 cells))]
        ; text link to reset the game
        [:p [:a {:class "new-game" :on-click #(new-game)
-                :href "#"} "New game"]]
-       [:p [:a {:class "new-game" :on-click #(clicked)
-                :href "#"} "Inc"]]])))
+                :href "#"} "New game"]] ])))
 
 (defn current-page []
   [:div [(session/get :current-page)]])
@@ -138,9 +128,8 @@
 (defn mount-root []
   (reagent/render [board-page] (.getElementById js/document "app")))
 
-(new-game)
-
 (defn init! []
   (accountant/configure-navigation!)
   (accountant/dispatch-current!)
+  (new-game)
   (mount-root))
