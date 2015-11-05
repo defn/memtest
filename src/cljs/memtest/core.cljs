@@ -22,17 +22,23 @@
   []
   ; game is won when count of matches is equal to half of gameboard, because
   ; cells contain duplicate numbers
-  (= (/ (count @gameboard) 2) (count @matched)))
+  (and (= (/ (count @gameboard) 2) (count @matched))
+       (not= (count @matched) 0)))
 
 (defn add-cell [n]
   ; add a numbered cell with a unique id
   (let [id (swap! counter inc)]
     (swap! gameboard assoc id {:id id :number n :color (colors n)})))
 
-(defn new-game
+(defn clicked 
+  []
+  (swap! counter inc))
+
+(defn new-game 
   []
   ; game starts out with an empty board, no cell selected, nothing hilighted,
   ; and no matches
+  (reset! counter 0)
   (reset! gameboard (sorted-map))
   (reset! selected nil)
   (reset! matched #{})
@@ -99,10 +105,13 @@
     (let [cells (vals @gameboard)]
       [:div#container
        ; game title
-       [:h1 "The memory game"]
+       [:h1 "The Memory Game"]
        ; win status
-       [:h2 (if (won-game?) "You won!")]
-       ; the gameboard
+       [:h2 (if (won-game?) "You won!!!")]
+       [:h2 (count @gameboard)]
+       [:h2 (count @matched)]
+       [:h2 @counter]
+       ; the gameboard 
        [:table#gameboard
         ; taking 4 cells at a time for each row
         (map-indexed
@@ -110,7 +119,9 @@
          (partition 4 cells))]
        ; text link to reset the game
        [:p [:a {:class "new-game" :on-click #(new-game)
-                :href "#"} "New game"]]])))
+                :href "#"} "New game"]]
+       [:p [:a {:class "new-game" :on-click #(clicked)
+                :href "#"} "Inc"]]])))
 
 (defn current-page []
   [:div [(session/get :current-page)]])
@@ -127,8 +138,9 @@
 (defn mount-root []
   (reagent/render [board-page] (.getElementById js/document "app")))
 
+(new-game)
+
 (defn init! []
   (accountant/configure-navigation!)
   (accountant/dispatch-current!)
-  (new-game)
   (mount-root))
