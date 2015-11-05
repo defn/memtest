@@ -3,8 +3,7 @@
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
-              [memtest.data :as mdata :refer [counter gameboard matched selected highlighted]]))
-
+              [memtest.data :as mdata :refer [counter gameboard selected highlighted matched]]))
 
 (def colors ; colors match the cell number
   {1 "#677685", 2 "#FFB492", 3 "#8EE6CA", 4 "#92387E",
