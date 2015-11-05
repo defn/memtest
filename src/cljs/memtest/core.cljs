@@ -125,7 +125,7 @@
 ;; Initialize app
 
 (defn mount-root []
-  (reagent/render [board] (.getElementById js/document "app")))
+  (reagent/render [board-page] (.getElementById js/document "app")))
 
 (defn init! []
   (accountant/configure-navigation!)
