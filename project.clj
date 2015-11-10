@@ -21,12 +21,7 @@
             :plugins [[lein-environ "1.0.1"]
                       [lein-asset-minifier "0.2.2"]]
 
-            :ring {:handler memtest.handler/app
-                   :uberwar-name "memtest.war"}
-
-            :min-lein-version "2.5.0"
-
-            :uberjar-name "memtest.jar"
+            :ring {:handler memtest.handler/app}
 
             :main memtest.server
 
@@ -36,9 +31,8 @@
 
             :source-paths ["src/clj" "src/cljc"]
 
-            :minify-assets
-            {:assets
-             {"resources/public/css/site.min.css" "resources/public/css/site.css"}}
+            :minify-assets {
+                            :assets {"resources/public/css/site.min.css" "resources/public/css/site.css"}}
 
             :cljsbuild {:builds {:app {:source-paths ["src/cljs" "src/cljc"]
                                        :compiler {:output-to "resources/public/js/app.js"
@@ -59,6 +53,7 @@
                              :source-paths ["env/dev/clj"]
                              :plugins [[lein-figwheel "0.4.1"]
                                        [lein-cljsbuild "1.1.0"]]
+                             :hooks [minify-assets.plugin/hooks]
 
                              :injections [(require 'pjstadig.humane-test-output)
                                           (pjstadig.humane-test-output/activate!)]
@@ -83,18 +78,4 @@
                                                                         :asset-path "js/devcards_out"
                                                                         :output-to "resources/public/js/app_devcards.js"
                                                                         :output-dir "resources/public/js/devcards_out"
-                                                                        :source-map-timestamp true}}
-                                                  }
-
-                                         }}
-
-                       :uberjar {:hooks [leiningen.cljsbuild minify-assets.plugin/hooks]
-                                 :env {:production true}
-                                 :aot :all
-                                 :omit-source true
-                                 :cljsbuild {:jar true
-                                             :builds {:app
-                                                      {:source-paths ["env/prod/cljs"]
-                                                       :compiler
-                                                       {:optimizations :advanced
-                                                        :pretty-print false}}}}}})
+                                                                        :source-map-timestamp true}}}}}})

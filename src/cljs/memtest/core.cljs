@@ -3,7 +3,6 @@
               [reagent.session :as session]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
-              [material-ui.core :as ui :include-macros true]
               [memtest.data :as mdata :refer [counter gameboard selected highlighted matched]]))
 
 (def colors ; colors match the cell number
@@ -108,13 +107,7 @@
           (partition 4 cells))]
        ; text link to reset the game
        [:p [:a {:class "new-game" :on-click #(new-game)
-                :href "#"} "New Game"]] 
-       ; material-ui
-       [ui/TextField {:hintText "Please enter your last name"
-                      :value "meh"
-                      :floatingLabelText "Last Name"}]
-
-       ])))
+                :href "#"} "New Game"]]])))
 
 (defn current-page []
   [:div [(session/get :current-page)]])
