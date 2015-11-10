@@ -25,7 +25,8 @@
      (include-css (if (env :dev) "css/site.css" "css/site.min.css"))]
     [:body
      mount-target
-     (include-js "js/app.js")]]))
+     (include-js "js/app.js")
+     (include-js "js/material-ui/index.js")]]))
 
 (def cards-page
   (html
