@@ -107,7 +107,9 @@
           (partition 4 cells))]
        ; text link to reset the game
        [:p [:a {:class "new-game" :on-click #(new-game)
-                :href "#"} "New Game"]]])))
+                :href "#"} "New Game"]]
+       
+       ])))
 
 (defn current-page []
   [:div [(session/get :current-page)]])
