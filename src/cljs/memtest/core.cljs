@@ -1,9 +1,12 @@
 (ns memtest.core
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
+              [cljsjs.react-bootstrap]
               [secretary.core :as secretary :include-macros true]
               [accountant.core :as accountant]
               [memtest.data :as mdata :refer [counter gameboard selected highlighted matched]]))
+
+(def Button (reagent/adapt-react-class (aget js/ReactBootstrap "Button")))
 
 (def colors ; colors match the cell number
   {1 "#677685", 2 "#FFB492", 3 "#8EE6CA", 4 "#92387E",
@@ -108,6 +111,8 @@
        ; text link to reset the game
        [:p [:a {:class "new-game" :on-click #(new-game)
                 :href "#"} "New Game"]]
+       ; Bootstrap
+       [Button "with a button"]
        
        ])))
 
